@@ -1,20 +1,35 @@
-// https://github.com/danigb/tonal/blob/master/README.md
 var contour = [1, 2, 3, -2, 2, 4, -5];
+var startChord = "C";
+var threads = 4;
+var rootDomain = Tonal.Scale.notes("C major");
+var chordQualityDomain = ["", "m", "7"];
 
-var currentChord = 1;
 
-var chordSequence = new Array(contour.length + 1);
-
-chordSequence[0] = currentChord;
-
+// main generation function
+// iterates through each element of contour array
+// first rows are better fit, next best
 function generate() {
-	for (i = 0; i < contour.length; i++) {
-		// TODO write generation algorithm
+	// 2nd chord is special bc can't be 2 of the same
+	let usedChords = [ 0 ];
+	for (j = 0; j < threads; j++) {
+		let currentChord = findBestChord(chords[0, j], usedChords, contour[0]);
+
+		usedChords.push(currentChord);
+		chords[1][j] = currentChord;
+	}
+
+	// for each element of contour after 2, generate chords
+	// (1st is predefined, 2nd is special case, above)
+	for (i = 2; i < contour.length+1; i++) {
+		// for each thread
+		for (j = 0; j < threads; j++) {
+			chords[i][j] = findBestChord(chords[i-1, j], null, contour[i-1]);
+		}
 	}
 }
 
 function findtrq(chord1, chord2) {
-	// trq = tension/release quotient
+	// trq = tension-release quotient
 	// integer from -10 to 10
 	// positive = tense, negative = release
 	let trq = 0;
@@ -63,20 +78,93 @@ function findtrq(chord1, chord2) {
 			console.warn("root interval change not understood");
 	}
 
-	// find number of common tones, subtract double that number from trq
-	trq -= (Tonal.Chord.notes(chord1).filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length() * 2;
+	// find number of common tones, subtract 1.5 times that number from trq
+	//trq -= (Tonal.Chord.notes(chord1).filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length() * 2;
 
 
 	return Math.min(Math.max(trq, -10), 10);
 }
 
-function printChords() {
-	let chordText = "<b>chords:</b><br />";
-	for (i = 0; i < chordSequence.length; i++) {
-		chordText += chordSequence[i] + " chord<br />";
+// cycle through every possible chord, find best trq & return corresponding chord
+// banned chords are unused
+function findBestChord(last, banned, trq) {
+	var nextBestChord;
+	var nextBestTrqDiff = Infinity;
+	var currentChord;
+	var currentTrqDiff;
+
+	for(i = 0; i < rootDomain.length; i++) {
+		for(j = 0; j < chordQualityDomain.length; j++) {
+			currentChord = rootDomain[i] + chordQualityDomain[j];
+			currentTrqDiff = Math.abs(findtrq(last, currentChord)-trq);
+
+			if(currentTrqDiff <= nextBestTrqDiff) {
+				/*
+				if(banned != null) {
+					var isBanned = false;
+					for (k = banned.length - 1; k >= 0; k--) {
+						if(banned[i] == currentChord) {
+							console.log("found banned chord")
+							isBanned = true;
+						}
+					}
+
+					if(isBanned == false) {
+						nextBestChord = currentChord;
+						nextBestTrqDiff = currentTrqDiff;
+					}
+				} else {
+					nextBestChord = currentChord;
+					nextBestTrqDiff = currentTrqDiff;
+				}*/
+
+				nextBestChord = currentChord;
+				nextBestTrqDiff = currentTrqDiff;
+			}
+		}
 	}
-	document.getElementById("chords").innerHTML = chordText;
+
+	return currentChord;
 }
 
 
-printChords(generate());
+// create n-dimentional chord array
+function createChordArray(length) {
+    var chords = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) chords[length-1 - i] = createChordArray.apply(this, args);
+    }
+
+    return chords;
+}
+
+// print chords to "chord" HTML element
+function printChords() {
+	chordText = "";
+	for (i = 0; i < chords.length; i++) {
+		chordText += chords[i][0] + "<br />";
+	}
+	document.getElementById("chords").innerHTML = chordText;
+	console.log("chords successfully generated and printed")
+}
+
+
+
+// GENERATE CHORDS!
+
+// create chord array
+// chords[x][y], rows = sequences
+var chords = createChordArray(contour.length+1, threads);
+
+for (var i = threads - 1; i >= 0; i--) {
+	chords[0][i] = startChord;
+}
+
+generate();
+
+console.log(chords);
+
+printChords();
