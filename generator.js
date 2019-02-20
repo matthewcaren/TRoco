@@ -8,6 +8,8 @@ var chordQualityDomain = ["", "m", "7"];
 // main generation function
 // iterates through each element of contour array
 // first rows are better fit, next best
+// i = rows = time
+// j = columns = threads
 function generate() {
 	// 2nd chord is special bc can't be 2 of the same
 	let usedChords = [ 0 ];
@@ -22,8 +24,8 @@ function generate() {
 	// (1st is predefined, 2nd is special case, above)
 	for (i = 2; i < contour.length+1; i++) {
 		// for each thread
-		for (j = 0; j < threads; j++) {
-			chords[i][j] = findBestChord(chords[i-1, j], null, contour[i-1]);
+		for (j = 0; j < threads^2 % threads; j++) {
+			chords[i][j] = findBestChord(chords[i-1, j % threads], chords.slice(0, j), contour[i-1]);
 		}
 	}
 }
@@ -31,7 +33,8 @@ function generate() {
 function findtrq(chord1, chord2) {
 	// trq = tension-release quotient
 	// integer from -10 to 10
-	// positive = tense, negative = release
+	// positive = tense
+    // negative = release
 	let trq = 0;
 	
 	let rootInterval = Math.abs(Tonal.Note.chroma(Tonal.Chord.notes(chord1)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(chord2)[0]))%12;
@@ -86,7 +89,7 @@ function findtrq(chord1, chord2) {
 }
 
 // cycle through every possible chord, find best trq & return corresponding chord
-// banned chords are unused
+// do not return banned chords
 function findBestChord(last, banned, trq) {
 	var nextBestChord;
 	var nextBestTrqDiff = Infinity;
@@ -99,7 +102,6 @@ function findBestChord(last, banned, trq) {
 			currentTrqDiff = Math.abs(findtrq(last, currentChord)-trq);
 
 			if(currentTrqDiff <= nextBestTrqDiff) {
-				/*
 				if(banned != null) {
 					var isBanned = false;
 					for (k = banned.length - 1; k >= 0; k--) {
@@ -113,13 +115,7 @@ function findBestChord(last, banned, trq) {
 						nextBestChord = currentChord;
 						nextBestTrqDiff = currentTrqDiff;
 					}
-				} else {
-					nextBestChord = currentChord;
-					nextBestTrqDiff = currentTrqDiff;
-				}*/
-
-				nextBestChord = currentChord;
-				nextBestTrqDiff = currentTrqDiff;
+				}
 			}
 		}
 	}
@@ -157,7 +153,7 @@ function printChords() {
 
 // create chord array
 // chords[x][y], rows = sequences
-var chords = createChordArray(contour.length+1, threads);
+var chords = createChordArray(contour.length+1, threads^2);
 
 for (var i = threads - 1; i >= 0; i--) {
 	chords[0][i] = startChord;
