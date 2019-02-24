@@ -1,0 +1,80 @@
+html {
+	height: 100%
+}
+
+body {
+	background-image: radial-gradient(#222, black);
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin: 0;
+	color: white;
+}
+
+h2 {
+	font-family: 'Staatliches', sans-serif;
+	font-weight: normal;
+	font-size: 100px;
+	margin: 0;
+}
+
+button {
+  background-color: #ddd;
+  border: none;
+  color: #222222;
+  padding: 10px 42px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 24px;
+  font-family: 'Staatliches', sans-serif;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  -webkit-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+}
+
+button:hover {
+  background-color: #fff;
+}
+
+
+.centerAll {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	text-align: justify;
+	-moz-text-align-last: center;
+	text-align-last: center;
+}
+
+.topnav {
+	overflow: hidden;
+	height: 60px;
+}
+
+.topnav a {
+	float: left;
+	display: block;
+	color: #aaa;
+	font-family: 'Staatliches';
+	font-size: 16pt;
+	letter-spacing: 2px;
+	padding: 14px 16px;
+	text-align: center;
+	text-decoration: none;
+	-webkit-transition-duration: 0.2s;
+  	transition-duration: 0.2s;
+}
+
+.topnav a:hover {
+	color: #bcd;
+}
+
+
+#chords {
+	font-family: 'Lora', sans-serif;
+	font-weight: normal;
+	font-size: 25px;
+}

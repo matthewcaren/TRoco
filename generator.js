@@ -1,33 +1,43 @@
-var contour = [1, 2, 3, -2, 2, 4, -5];
+var contour = [1, 2, -2, 2, 4, 6, -5];
 var startChord = "C";
-var threads = 4;
-var rootDomain = Tonal.Scale.notes("C major");
+var threads = 2;
+var numGenerations = threads**contour.length;
+
+var toneDomain = Tonal.Scale.notes("C major");
 var chordQualityDomain = ["", "m", "7"];
 
 
 // main generation function
 // iterates through each element of contour array
 // first rows are better fit, next best
-// i = rows = time
-// j = columns = threads
+// each row represents one chord sequence
+// i = rows
+// j = columns
 function generate() {
-	// 2nd chord is special bc can't be 2 of the same
-	let usedChords = [ 0 ];
-	for (j = 0; j < threads; j++) {
-		let currentChord = findBestChord(chords[0, j], usedChords, contour[0]);
+	chords[0][0] = startChord;
+	//fillArray(0, 8);
 
-		usedChords.push(currentChord);
-		chords[1][j] = currentChord;
-	}
+	let streakLength = 9;
+	let usedChords = [ ];
 
-	// for each element of contour after 2, generate chords
-	// (1st is predefined, 2nd is special case, above)
-	for (i = 2; i < contour.length+1; i++) {
-		// for each thread
-		for (j = 0; j < threads^2 % threads; j++) {
-			chords[i][j] = findBestChord(chords[i-1, j % threads], chords.slice(0, j), contour[i-1]);
+	for(i = 1; i < contour.length+1; i++) {
+		console.log("i=" + i);
+		fillArray(i-1, streakLength);
+
+		usedChords.length = 0;
+
+		// "streak" = duplicated chords
+		// so any row is a valid chord sequence
+		streakLength = threads**(contour.length-i);
+
+		// set first element in streak
+		for(j = 0; j < threads**i; j++) {
+			bestChord = findBestChord(chords[i-1][j*streakLength], usedChords, contour[i-1]);
+			usedChords.push(bestChord);
+			chords[i][j*streakLength] = bestChord;
 		}
 	}
+	
 }
 
 function findtrq(chord1, chord2) {
@@ -81,46 +91,46 @@ function findtrq(chord1, chord2) {
 			console.warn("root interval change not understood");
 	}
 
-	// find number of common tones, subtract 1.5 times that number from trq
-	//trq -= (Tonal.Chord.notes(chord1).filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length() * 2;
-
+	// find number of common tones, divide TRQ by that number
+	trq /= (Tonal.Chord.notes(chord1).filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length;
+	
+	// find number of tones not in key, add half that number to TRQ
+	//trq += (toneDomain.filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length /2;
 
 	return Math.min(Math.max(trq, -10), 10);
 }
 
 // cycle through every possible chord, find best trq & return corresponding chord
 // do not return banned chords
-function findBestChord(last, banned, trq) {
+function findBestChord(last, banned, goalTrq) {
 	var nextBestChord;
 	var nextBestTrqDiff = Infinity;
 	var currentChord;
 	var currentTrqDiff;
+	var isBanned;
 
-	for(i = 0; i < rootDomain.length; i++) {
-		for(j = 0; j < chordQualityDomain.length; j++) {
-			currentChord = rootDomain[i] + chordQualityDomain[j];
-			currentTrqDiff = Math.abs(findtrq(last, currentChord)-trq);
+	for(m = 0; m < toneDomain.length; m++) {
+		for(n = 0; n < chordQualityDomain.length; n++) {
+			currentChord = toneDomain[m] + chordQualityDomain[n];
+			currentTrqDiff = Math.abs(findtrq(last, currentChord)-goalTrq);
 
 			if(currentTrqDiff <= nextBestTrqDiff) {
-				if(banned != null) {
-					var isBanned = false;
-					for (k = banned.length - 1; k >= 0; k--) {
-						if(banned[i] == currentChord) {
-							console.log("found banned chord")
-							isBanned = true;
-						}
+				isBanned = false;
+				for (k = 0; k < banned.length; k++) {
+					if(banned[k] == currentChord) {
+						isBanned = true;
 					}
+				}
 
-					if(isBanned == false) {
-						nextBestChord = currentChord;
-						nextBestTrqDiff = currentTrqDiff;
-					}
+				if(!isBanned) {
+					nextBestChord = currentChord;
+					nextBestTrqDiff = currentTrqDiff;
 				}
 			}
 		}
 	}
 
-	return currentChord;
+	return nextBestChord;
 }
 
 
@@ -137,6 +147,19 @@ function createChordArray(length) {
     return chords;
 }
 
+function fillArray (i, streakLength) {
+	// fill in rest of streak
+	let chordsToPush = [ ];
+	for(a = 0; a < threads**i; a++) {
+		chordsToPush.push(chords[i][a*streakLength]);
+	}
+	console.log("chords to push " + chordsToPush);
+
+	for(b = 0; b < chords[i].length; b++) {
+		chords[i][b] = chordsToPush[Math.floor(b/streakLength)];
+	}
+}
+
 // print chords to "chord" HTML element
 function printChords() {
 	chordText = "";
@@ -148,19 +171,19 @@ function printChords() {
 }
 
 
-
-// GENERATE CHORDS!
-
 // create chord array
 // chords[x][y], rows = sequences
-var chords = createChordArray(contour.length+1, threads^2);
-
-for (var i = threads - 1; i >= 0; i--) {
-	chords[0][i] = startChord;
-}
-
-generate();
-
+var chords = createChordArray(contour.length+1, numGenerations);
+console.log("created empty array " + chords.length + " by " + chords[0].length);
 console.log(chords);
 
-printChords();
+// GENERATE CHORDS!
+function main() {
+	console.log("beginning chord generation...");
+
+	generate();
+	console.log(chords);
+
+	// print chords to page
+	printChords();
+}
