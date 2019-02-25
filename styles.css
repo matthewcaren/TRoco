@@ -30,10 +30,15 @@ button {
   border-radius: 8px;
   -webkit-transition-duration: 0.2s;
   transition-duration: 0.2s;
+  margin-top: 24px;
 }
 
 button:hover {
   background-color: #fff;
+}
+
+button:focus {
+  outline: 0;
 }
 
 
@@ -77,4 +82,5 @@ button:hover {
 	font-family: 'Lora', sans-serif;
 	font-weight: normal;
 	font-size: 25px;
+	margin-top: 0;
 }

@@ -1,7 +1,11 @@
-var contour = [1, 2, -2, 2, 4, 6, -5];
+// TODO add CanvasJS
+// https://canvasjs.com/docs/charts/chart-options/data/click/
+
+var contour = [2,3,-1,5,-6];
 var startChord = "C";
 var threads = 2;
 var numGenerations = threads**contour.length;
+var color = 1;
 
 var toneDomain = Tonal.Scale.notes("C major");
 var chordQualityDomain = ["", "m", "7"];
@@ -17,7 +21,7 @@ function generate() {
 	chords[0][0] = startChord;
 	//fillArray(0, 8);
 
-	let streakLength = 9;
+	let streakLength = numGenerations;
 	let usedChords = [ ];
 
 	for(i = 1; i < contour.length+1; i++) {
@@ -32,22 +36,24 @@ function generate() {
 
 		// set first element in streak
 		for(j = 0; j < threads**i; j++) {
-			bestChord = findBestChord(chords[i-1][j*streakLength], usedChords, contour[i-1]);
+			console.log(j);
+			[bestChord, bestTrq] = findBestChord(chords[i-1][j*streakLength], usedChords, contour[i-1]);
 			usedChords.push(bestChord);
 			chords[i][j*streakLength] = bestChord;
+			trqArray[i][j*streakLength] = bestTrq;
 		}
 	}
 	
 }
 
-function findtrq(chord1, chord2) {
+function findtrq(last, current) {
 	// trq = tension-release quotient
 	// integer from -10 to 10
 	// positive = tense
     // negative = release
 	let trq = 0;
 	
-	let rootInterval = Math.abs(Tonal.Note.chroma(Tonal.Chord.notes(chord1)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(chord2)[0]))%12;
+	let rootInterval = Math.abs(Tonal.Note.chroma(Tonal.Chord.notes(last)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(current)[0]))%12;
 
 	// change trq based on root interval
 	switch (rootInterval) {
@@ -92,10 +98,10 @@ function findtrq(chord1, chord2) {
 	}
 
 	// find number of common tones, divide TRQ by that number
-	trq /= (Tonal.Chord.notes(chord1).filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length;
+	trq /= (Tonal.Chord.notes(last).filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length;
 	
 	// find number of tones not in key, add half that number to TRQ
-	//trq += (toneDomain.filter(value => -1 !== Tonal.Chord.notes(chord2).indexOf(value))).length /2;
+	// trq += (toneDomain.filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length /2;
 
 	return Math.min(Math.max(trq, -10), 10);
 }
@@ -105,6 +111,7 @@ function findtrq(chord1, chord2) {
 function findBestChord(last, banned, goalTrq) {
 	var nextBestChord;
 	var nextBestTrqDiff = Infinity;
+	var nextBestTrq;
 	var currentChord;
 	var currentTrqDiff;
 	var isBanned;
@@ -125,12 +132,14 @@ function findBestChord(last, banned, goalTrq) {
 				if(!isBanned) {
 					nextBestChord = currentChord;
 					nextBestTrqDiff = currentTrqDiff;
+
+					nextBestTrq = findtrq(last, currentChord);
 				}
 			}
 		}
 	}
 
-	return nextBestChord;
+	return [nextBestChord, nextBestTrq];
 }
 
 
@@ -147,16 +156,42 @@ function createChordArray(length) {
     return chords;
 }
 
+// create n-dimentional TRQ array
+function createTRQArray(length) {
+    var trqArray = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) trqArray[length-1 - i] = createTRQArray.apply(this, args);
+    }
+
+    return trqArray;
+}
+
 function fillArray (i, streakLength) {
 	// fill in rest of streak
 	let chordsToPush = [ ];
 	for(a = 0; a < threads**i; a++) {
 		chordsToPush.push(chords[i][a*streakLength]);
 	}
-	console.log("chords to push " + chordsToPush);
+	console.log(i + " " + chordsToPush);
 
 	for(b = 0; b < chords[i].length; b++) {
 		chords[i][b] = chordsToPush[Math.floor(b/streakLength)];
+	}
+}
+
+function prune() {
+	// check for chords with too many color tones
+	for (i = 0; i < chords.length; i++) {
+		for (j = 0; j < chords[i].length; j++) {
+			if ((Tonal.Chord.notes(chords[i][j]).length - (toneDomain.filter(value => -1 !== Tonal.Chord.notes(chords[i][j]).indexOf(value))).length) > color) {
+				for (c = 0; c < chords.length; c++) {
+					chords[c].splice(j, 1);
+				}
+			}
+		}
 	}
 }
 
@@ -175,14 +210,19 @@ function printChords() {
 // chords[x][y], rows = sequences
 var chords = createChordArray(contour.length+1, numGenerations);
 console.log("created empty array " + chords.length + " by " + chords[0].length);
-console.log(chords);
+
+var trqArray = createTRQArray(contour.length+1, numGenerations);
+console.log(trqArray);
 
 // GENERATE CHORDS!
 function main() {
 	console.log("beginning chord generation...");
-
 	generate();
+
+	console.log("beginning pruning...");
+	//prune();
 	console.log(chords);
+	console.log(trqArray);
 
 	// print chords to page
 	printChords();
