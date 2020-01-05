@@ -3,7 +3,7 @@ html {
 }
 
 body {
-	background-image: radial-gradient(#222, black);
+	background-image: radial-gradient(#111, black);
 	background-repeat: no-repeat;
 	background-size: cover;
 	margin: 0;
@@ -13,12 +13,38 @@ body {
 h2 {
 	font-family: 'Staatliches', sans-serif;
 	font-weight: normal;
-	font-size: 100px;
+	font-size: 84px;
 	margin: 0;
 }
 
-button {
-  background-color: #ddd;
+p {
+	font-family: 'Lora', sans-serif;
+	font-weight: normal;
+	font-size: 24px;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#input {
+	font-family: 'Lora', sans-serif;
+	font-size: 16px;
+	color: #fff;
+	background-color: #222;
+	margin-top: 20px;
+	outline: none;
+	border: none;
+	border-bottom: 2px solid #fff;
+	padding: 5px;
+	width: 80%;
+	transition: background-color 0.7s ease;
+}
+
+#input:focus {
+	background-color: #444;
+}
+
+#generatebutton {
+  background-color: #ccc;
   border: none;
   color: #222222;
   padding: 10px 42px;
@@ -33,11 +59,11 @@ button {
   margin-top: 24px;
 }
 
-button:hover {
+#generatebutton:hover {
   background-color: #fff;
 }
 
-button:focus {
+#generatebutton:focus {
   outline: 0;
 }
 
@@ -79,8 +105,5 @@ button:focus {
 
 
 #chords {
-	font-family: 'Lora', sans-serif;
-	font-weight: normal;
-	font-size: 25px;
-	margin-top: 0;
+
 }

@@ -1,14 +1,18 @@
 // TODO add CanvasJS
 // https://canvasjs.com/docs/charts/chart-options/data/click/
 
-var contour = [2,3,-1,5,-6];
+//var contour = [1,0,-1,5,-6];
+var contour;
 var startChord = "C";
 var threads = 2;
-var numGenerations = threads**contour.length;
-var color = 1;
+var numGenerations;;
+var color = 0;
 
 var toneDomain = Tonal.Scale.notes("C major");
-var chordQualityDomain = ["", "m", "7"];
+var chordQualityDomain = ["", "m", "7", "9"];
+
+var chords;
+var trqArray;
 
 
 // main generation function
@@ -36,14 +40,13 @@ function generate() {
 
 		// set first element in streak
 		for(j = 0; j < threads**i; j++) {
-			console.log(j);
 			[bestChord, bestTrq] = findBestChord(chords[i-1][j*streakLength], usedChords, contour[i-1]);
 			usedChords.push(bestChord);
 			chords[i][j*streakLength] = bestChord;
 			trqArray[i][j*streakLength] = bestTrq;
 		}
 	}
-	
+
 }
 
 function findtrq(last, current) {
@@ -52,7 +55,7 @@ function findtrq(last, current) {
 	// positive = tense
     // negative = release
 	let trq = 0;
-	
+
 	let rootInterval = Math.abs(Tonal.Note.chroma(Tonal.Chord.notes(last)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(current)[0]))%12;
 
 	// change trq based on root interval
@@ -99,9 +102,9 @@ function findtrq(last, current) {
 
 	// find number of common tones, divide TRQ by that number
 	trq /= (Tonal.Chord.notes(last).filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length;
-	
-	// find number of tones not in key, add half that number to TRQ
-	// trq += (toneDomain.filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length /2;
+
+	// find number of tones not in key, add double that number to TRQ
+	trq += (Tonal.Chord.notes(current).length - (toneDomain.filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length) * 2;
 
 	return Math.min(Math.max(trq, -10), 10);
 }
@@ -206,18 +209,39 @@ function printChords() {
 }
 
 
-// create chord array
-// chords[x][y], rows = sequences
-var chords = createChordArray(contour.length+1, numGenerations);
-console.log("created empty array " + chords.length + " by " + chords[0].length);
-
-var trqArray = createTRQArray(contour.length+1, numGenerations);
-console.log(trqArray);
-
 // GENERATE CHORDS!
-function main() {
+function main(form) {
+	var userinput = form.inputbox.value;
+	contour = userinput.split(",");
+
+	for(a = 0; a < contour.length; a++) {
+		contour[a] = parseInt(contour[a]);
+
+		if(Number.isNaN(contour[a]) || contour[a] > 10 || contour[a] < -10) {
+			alert("Invalid input. Please input a list of integers between -10 and 10 separated by commas.")
+			return;
+		}
+	}
+
+	numGenerations = threads**contour.length;
+	console.log("target profile: " + contour);
+
+	if (typeof contour == "undefined") {
+		alert("Please input a target profile before starting generation.")
+		return;
+	}
+
 	console.log("beginning chord generation...");
+
+	// create chord array
+	// chords[x][y], rows = sequences
+	chords = createChordArray(contour.length+1, numGenerations);
+	console.log("created empty array " + chords.length + " by " + chords[0].length);
+
+	trqArray = createTRQArray(contour.length+1, numGenerations);
+
 	generate();
+
 
 	console.log("beginning pruning...");
 	//prune();
@@ -226,4 +250,13 @@ function main() {
 
 	// print chords to page
 	printChords();
+}
+
+
+document.getElementById("userinputform").onkeypress = function(e) {
+  var key = e.charCode || e.keyCode || 0;
+  if (key == 13) {
+    main(document.getElementById("userinputform"));
+    e.preventDefault();
+  }
 }

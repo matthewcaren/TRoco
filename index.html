@@ -2,6 +2,7 @@
 
 <html>
 <head>
+	<title>algorithmic composer</title>
 	<link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
 	<link rel="stylesheet" href="styles.css">
@@ -12,9 +13,18 @@
 	</div>
 
 	<div class="centerAll">
+		<h2>target</h2>
+
+		<form action="" method="get" autocomplete="off" id="userinputform">
+			<p>enter the target TRQ profile: </p>
+			<input type="text" name="inputbox" value="" id="input"><br>
+			<input type="button" name="generatebutton" value="generate" onclick="main(this.form)" id="generatebutton">
+		</form>
+
+		<div style="height: 50px"></div>
+
 		<h2>chords</h2>
 		<p id="chords">no chords have been generated</p>
-		<button onclick="main()">start</button>
 	</div>
 
 	<script src="tonal.min.js"></script>
