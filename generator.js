@@ -3,13 +3,13 @@
 
 //var contour = [1,0,-1,5,-6];
 var contour;
-var startChord = "C";
+var startChord = "Csus";
 var threads = 2;
 var numGenerations;;
-var color = 0;
+var color = 1;
 
 var toneDomain = Tonal.Scale.notes("C major");
-var chordQualityDomain = ["", "m", "7", "9"];
+var chordQualityDomain = ["", "m", "7", "7#9"];
 
 var chords;
 var trqArray;
@@ -56,9 +56,17 @@ function findtrq(last, current) {
     // negative = release
 	let trq = 0;
 
-	let rootInterval = Math.abs(Tonal.Note.chroma(Tonal.Chord.notes(last)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(current)[0]))%12;
+	// trq offset based on root interval
 
-	// change trq based on root interval
+	let rootInterval = 0;
+	let posRootInterval = Tonal.Note.chroma(Tonal.Chord.notes(current)[0]) - Tonal.Note.chroma(Tonal.Chord.notes(last)[0]);
+	if (posRootInterval >= 0) {
+		rootInterval = posRootInterval;
+	} else {
+		rootInterval = posRootInterval + 12;
+	}
+
+
 	switch (rootInterval) {
 		case 0:
 			trq += 1;
@@ -67,7 +75,7 @@ function findtrq(last, current) {
 			trq += 4;
 			break;
 		case 2:
-			trq += 3;
+			trq += 1;
 			break;
 		case 3:
 			trq += 2;
@@ -76,7 +84,7 @@ function findtrq(last, current) {
 			trq += 3;
 			break;
 		case 5:
-			trq += -6;
+			trq += -7;
 			break;
 		case 6:
 			trq += 9;
@@ -91,19 +99,72 @@ function findtrq(last, current) {
 			trq += -2;
 			break;
 		case 10:
-			trq += -3;
-			break;
-		case 11:
 			trq += -2;
 			break;
+		case 11:
+			trq += -1;
+			break;
 		default:
-			console.warn("root interval change not understood");
+			console.warn("TRQ calculation: unknown root interval change: " + rootInterval);
 	}
 
-	// find number of common tones, divide TRQ by that number
-	trq /= (Tonal.Chord.notes(last).filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length;
+	let chordColor = current.substr(Tonal.Chord.notes(current)[0].length);
 
-	// find number of tones not in key, add double that number to TRQ
+	// trq offset based on chord quality
+	switch (chordColor) {
+		case "":
+			trq += 0;
+			break;
+		case "6":
+			trq += -1;
+			break;
+		case "M7":
+			trq += 0.5;
+			break;
+		case "M9":
+			trq += -1;
+			break;
+		case "m":
+			trq += 0;
+			break;
+		case "m7":
+			trq += -0.5;
+			break;
+		case "m9":
+			trq += 0;
+			break;
+		case "7":
+			trq += 2;
+			break;
+		case "7b9":
+			trq += 2.5;
+			break;
+		case "7#9":
+			trq += 3.5;
+			break;
+		case "9":
+			trq +=2;
+			break;
+		default:
+			console.warn("TRQ calculation: unknown chord quality: " + chordColor);
+	}
+
+	// check for dominant V to I
+	let dominant = ["7", "9", "11", "13"]
+	let major = ["", "6", "M"]
+	if (dominant.includes(last.substr(Tonal.Chord.notes(last)[0].length, Tonal.Chord.notes(last)[0].length +1))) {
+		if (rootInterval = 11) {
+			trq -= 1;
+		}
+		if (rootInterval = 5 && dominant.includes(chordColor.substr(0,1))) {
+			trq -= 3;
+		}
+	}
+
+	// find number of common tones
+	//(Tonal.Chord.notes(last).filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length;
+
+	// find number of tones not in key, add 2 times that number to TRQ
 	trq += (Tonal.Chord.notes(current).length - (toneDomain.filter(value => -1 !== Tonal.Chord.notes(current).indexOf(value))).length) * 2;
 
 	return Math.min(Math.max(trq, -10), 10);
