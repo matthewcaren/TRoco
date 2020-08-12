@@ -3,56 +3,56 @@ html {
 }
 
 body {
-	background-image: radial-gradient(#111, black);
-	background-repeat: no-repeat;
-	background-size: cover;
+	background-color: #f7f8f8;
 	margin: 0;
-	color: white;
+	color: black;
 }
 
 h2 {
-	font-family: 'Staatliches', sans-serif;
-	font-weight: normal;
-	font-size: 84px;
-	margin: 0;
+	font-family: 'Source Sans Pro', sans-serif;
+	font-weight: 600;
+	font-size: 72px;
+	margin-bottom: 12px;
+	margin-top: 0;
 }
 
 p {
 	font-family: 'Lora', sans-serif;
 	font-weight: normal;
-	font-size: 24px;
+	font-size: 22px;
 	margin-top: 0;
 	margin-bottom: 0;
 }
 
 #input {
-	font-family: 'Lora', sans-serif;
-	font-size: 16px;
-	color: #fff;
-	background-color: #222;
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 20px;
+	color: #444;
+	background-color: #fff;
 	margin-top: 20px;
 	outline: none;
 	border: none;
-	border-bottom: 2px solid #fff;
+	border-bottom: 3px solid #ddd;
 	padding: 5px;
 	width: 80%;
-	transition: background-color 0.7s ease;
+	transition: border-bottom 0.7s ease, background-color 0.5s ease;
 }
 
 #input:focus {
-	background-color: #444;
+	background-color: #e8e8e8;
+	border-bottom: 3px solid #444;
 }
 
 #generatebutton {
-  background-color: #ccc;
+  background-color: #777;
   border: none;
-  color: #222222;
+  color: #fff;
   padding: 10px 42px;
   text-align: center;
   text-decoration: none;
   font-size: 24px;
-  font-family: 'Staatliches', sans-serif;
-  letter-spacing: 1px;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: bold;
   border-radius: 8px;
   -webkit-transition-duration: 0.2s;
   transition-duration: 0.2s;
@@ -60,7 +60,7 @@ p {
 }
 
 #generatebutton:hover {
-  background-color: #fff;
+  background-color: #999;
 }
 
 #generatebutton:focus {
@@ -73,11 +73,12 @@ p {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	-ms-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	text-align: justify;
+	-ms-transform: translate(-50%, 45%);
+	transform: translate(-50%, -45%);
+	text-align: center;
 	-moz-text-align-last: center;
 	text-align-last: center;
+	clear: both;
 }
 
 .topnav {
@@ -88,10 +89,10 @@ p {
 .topnav a {
 	float: left;
 	display: block;
-	color: #aaa;
-	font-family: 'Staatliches';
+	color: #444;
+	font-family: 'Source Sans Pro';
 	font-size: 16pt;
-	letter-spacing: 2px;
+	letter-spacing: 1px;
 	padding: 14px 16px;
 	text-align: center;
 	text-decoration: none;
@@ -100,10 +101,11 @@ p {
 }
 
 .topnav a:hover {
-	color: #bcd;
+	color: #011;
 }
 
 
 #chords {
-
+	padding-bottom: 50px;
+	margin-bottom: 10px;
 }
