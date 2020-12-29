@@ -1,9 +1,10 @@
 html {
 	height: 100%
+	overflow:;
 }
 
 body {
-	background-color: #f7f8f8;
+	background-color: #f5f6f6;
 	margin: 0;
 	color: black;
 }
@@ -16,13 +17,31 @@ h2 {
 	margin-top: 0;
 }
 
+h3 {
+	font-family: 'Lora', serif;
+	font-weight: normal;
+	font-size: 17px;
+	color: #333;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	margin-right: 8px;
+	display: inline-block;
+}
+
 p {
-	font-family: 'Lora', sans-serif;
+	font-family: 'Lora', serif;
 	font-weight: normal;
 	font-size: 22px;
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+a {
+	text-decoration: none;
+	margin-left: 10px;
+	color: #aaa!important;
+}
+
 
 #input {
 	font-family: 'Source Sans Pro', sans-serif;
@@ -30,6 +49,7 @@ p {
 	color: #444;
 	background-color: #fff;
 	margin-top: 20px;
+	margin-bottom: 20px;;
 	outline: none;
 	border: none;
 	border-bottom: 3px solid #ccc;
@@ -44,7 +64,7 @@ p {
 }
 
 #generatebutton {
-  background-color: #777;
+  background-color: #666;
   border: none;
   color: #fff;
   padding: 10px 42px;
@@ -56,29 +76,33 @@ p {
   border-radius: 8px;
   -webkit-transition-duration: 0.2s;
   transition-duration: 0.2s;
-  margin-top: 24px;
+  margin-top: 30px;
 }
 
 #generatebutton:hover {
-  background-color: #999;
+  background-color: #444;
 }
 
 #generatebutton:focus {
   outline: 0;
 }
 
+.wrapper {
+	position: relative;
+}
 
 .centerAll {
 	margin: 0;
 	position: absolute;
-	top: 50%;
+	top: 49%;
 	left: 50%;
 	-ms-transform: translate(-50%, 45%);
-	transform: translate(-50%, -45%);
+	transform: translate(-50%, 8%);
 	text-align: center;
 	-moz-text-align-last: center;
 	text-align-last: center;
 	clear: both;
+	display: inline-block;
 }
 
 .topnav {
@@ -106,6 +130,29 @@ p {
 
 
 #chords {
-	padding-bottom: 50px;
+	padding-bottom: 40px;
 	margin-bottom: 10px;
+}
+
+.details {
+	font-family: 'Lora', serif;
+	font-weight: normal;
+	color: #444;
+}
+
+#startInput {
+	width: 100px;
+}
+
+.bottom {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.footnotes {
+	font-family: 'Source Sans Pro', sans-serif;
+	font-weight: 300;
+	font-size: 11pt;
+	color: #888;
+	display: inline-block;
 }

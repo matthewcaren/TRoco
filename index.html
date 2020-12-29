@@ -2,32 +2,67 @@
 
 <html>
 <head>
-	<title>algorithmic composer</title>
+	<title>TRoco</title>
 	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
 	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<!-- <div class="topnav">
-		<a href="#">&#9664; BACK</a>
-	</div> -->
+	<div class="wrapper">
+		<div class="centerAll">
+			<h2>Target</h2>
 
-	<div class="centerAll">
-		<h2>Target</h2>
+			<form action="" method="get" autocomplete="off" id="userinputform">
+				<p>enter a target TRQ profile: </p>
+				<input type="text" name="inputbox" value="" id="input"><br>
 
-		<form action="" method="get" autocomplete="off" id="userinputform">
-			<p>enter a target TRQ profile: </p>
-			<input type="text" name="inputbox" value="" id="input"><br>
-			<input type="button" name="generatebutton" value="Generate" onclick="main(this.form)" id="generatebutton">
-		</form>
+				<div>
+					<h3>key/tonality:</h3>
+					<select name="tonic" class="details">
+						<option value="Ab">Ab</option>
+						<option value="A">A</option>
+						<option value="Bb">Bb</option>
+						<option value="B">B</option>
+						<option selected value="C">C</option>
+						<option value="Db">Db</option>
+						<option value="D">D</option>
+						<option value="Eb">Eb</option>
+						<option value="F">F</option>
+						<option value="Gb">Gb</option>
+						<option value="G">G</option>
+					</select>
+					<select name="scale" class="details">
+						<option selected value="major">Major</option>
+						<option value="minor">Minor</option>
+						<option value="dorian">Dorian</option>
+						<option value="phrygian">Phrygian</option>
+						<option value="lydian">Lydian</option>
+						<option value="mixolydian">Mixolydian</option>
+						<option value="locrian">Locrian</option>
+					</select>
+				</div>
 
-		<div style="height: 80px"></div>
+				<div class="details">
+					<h3>starting chord:</h3>
+					<input type="text" name="startChord" value="Dm7" class="details" id="startInput">
+				</div>
 
-		<h2>Chords</h2>
-		<p id="chords">no chords have been generated</p>
+				<input type="button" name="generatebutton" value="Generate" onclick="main(this.form)" id="generatebutton">
+			</form>
+
+			<div style="height: 60px"></div>
+
+			<h2>Chords</h2>
+			<p id="chords">no chords have been generated</p>
+
+			<div class="bottom">
+				<p class="footnotes">Learn more about TRoco:</p>
+				<a href="https://github.com/matthewcaren/TRoco" class="footnotes">Project Github</a>
+				<a href="https://zenodo.org/record/4285336#.X-qnoOlKjPg" class="footnotes">Read the Paper</a>
+			</div>
+		</div>
+		<script src="tonal.min.js"></script>
+		<script src="generator.js"></script>
 	</div>
-
-	<script src="tonal.min.js"></script>
-	<script src="generator.js"></script>
 </body>
 </html>

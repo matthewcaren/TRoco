@@ -3,13 +3,14 @@
 
 //var contour = [1,0,-1,5,-6];
 var contour;
-var startChord = "Csus";
-var threads = 2;
-var numGenerations;;
+var startChord = "Dm7";
+var threads = 1;
+var numGenerations;
 var color = 1;
+var repeatChordsOk = false;
 
 var toneDomain = Tonal.Scale.notes("C major");
-var chordQualityDomain = ["", "m", "7", "7#9"];
+var chordQualityDomain = ["6", "maj7", "maj9", "m7", "m9", "7", "7b9", "mM7"];
 
 var chords;
 var trqArray;
@@ -118,8 +119,8 @@ function findtrq(last, current) {
 		case "6":
 			trq += -1;
 			break;
-		case "M7":
-			trq += 0.5;
+		case "Maj7":
+			trq += 1;
 			break;
 		case "M9":
 			trq += -1;
@@ -142,8 +143,17 @@ function findtrq(last, current) {
 		case "7#9":
 			trq += 3.5;
 			break;
+		case "7#9#5":
+			trq += 3.5;
+			break;
+		case "7#9#11":
+			trq += 4;
+			break;
 		case "9":
 			trq +=2;
+			break;
+		case "mMaj7":
+			trq +=4.5;
 			break;
 		default:
 			console.warn("TRQ calculation: unknown chord quality: " + chordColor);
@@ -193,7 +203,7 @@ function findBestChord(last, banned, goalTrq) {
 					}
 				}
 
-				if(!isBanned) {
+				if(!isBanned && last != currentChord) {
 					nextBestChord = currentChord;
 					nextBestTrqDiff = currentTrqDiff;
 
@@ -209,6 +219,7 @@ function findBestChord(last, banned, goalTrq) {
 
 // create n-dimentional chord array
 function createChordArray(length) {
+	console.log(length);
     var chords = new Array(length || 0),
         i = length;
 
@@ -272,8 +283,9 @@ function printChords() {
 
 // GENERATE CHORDS!
 function main(form) {
-	var userinput = form.inputbox.value;
-	contour = userinput.split(",");
+	contour = form.inputbox.value.split(",");
+	toneDomain = Tonal.Scale.notes(form.tonic.value + " " + form.scale.value);
+	startChord = form.startChord.value;
 
 	for(a = 0; a < contour.length; a++) {
 		contour[a] = parseInt(contour[a]);
@@ -284,11 +296,19 @@ function main(form) {
 		}
 	}
 
-	numGenerations = threads**contour.length;
+	numGenerations = threads*contour.length;
 	console.log("target profile: " + contour);
 
 	if (typeof contour == "undefined") {
 		alert("Please input a target profile before starting generation.")
+		return;
+	}
+
+	if (startChord == "") {
+		alert("Please input a starting chord before starting generation.")
+		return;
+	} else if (Tonal.Chord.notes(startChord).length == 0) {
+		alert(startChord + " is not a recognized chord. Please input a valid starting chord.")
 		return;
 	}
 
